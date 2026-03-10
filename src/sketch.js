@@ -20,7 +20,6 @@ const icons = {
 const isNumber = (val) => /^\d+$/.test(val)
 
 const renderBlock = (value, bg, sizeX, sizeY,) => {
-  console.log(bg, value);
 
   fill(bg)
   rect(0, 0, sizeX, sizeY)
@@ -46,7 +45,7 @@ const renderBoard = (board) => {
     push()
     for (let r = 0; r < board.height; r++) {
       const { bg, value } = matrix[c][r]
-      const bgColor = icons[bg] || [0, 0, 0, 0]
+      const bgColor = icons[bg] || bg
       renderBlock(value, bgColor, sizeX, sizeY)
       translate(sizeY, 0);
     }
@@ -87,24 +86,12 @@ class Game {
     const matrix = Array.from({ length: 10 }, () => Array.from({ length: 10 }, () => ({ value: 0, bg: " " })))
     return { matrix: this.addWater(matrix), height: 10, width: 10 };
   }
-
-  drawWater() {
-    const size = this.blockSize;
-    push()
-    for (const { x, y } of this.waterPositions) {
-      rect()
-    }
-  }
-
-}
-
-const drawGrid = () => {
-
 }
 
 const gameState = {
   game: null
 }
+
 function setup() {
   createCanvas(CONFIG.size, CONFIG.size);
   gameState.game = new Game(CONFIG.size);
@@ -112,9 +99,7 @@ function setup() {
 
 function draw() {
   background(220)
-
   fill(1)
-
   const board = gameState.game.getBoard()
   renderBoard(board)
   noLoop()
