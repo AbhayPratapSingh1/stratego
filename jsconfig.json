@@ -1,0 +1,11 @@
+{
+  "include": ["./**/*"],
+  "compilerOptions": {
+    "checkJs": true,
+    "module": "es6",
+    "target": "es6"
+  },
+  "typeAcquisition": {
+    "include": ["p5"]
+  }
+}
