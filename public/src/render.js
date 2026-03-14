@@ -14,15 +14,15 @@ const renderBlock = (value, bg, sizeX, sizeY,) => {
   }
 }
 
-const renderBoard = (board) => {
-  const sizeX = width / board.width;
-  const sizeY = height / board.height;
-  const matrix = board.matrix
+const renderBoard = (board, h, w) => {
+  const sizeX = width / w;
+  const sizeY = height / h;
+  const matrix = board
 
   push()
-  for (let c = 0; c < board.width; c++) {
+  for (let c = 0; c < w; c++) {
     push()
-    for (let r = 0; r < board.height; r++) {
+    for (let r = 0; r < h; r++) {
       const { bg, value } = matrix[c][r]
       const bgColor = ICONS[bg] || bg
       renderBlock(value, bgColor, sizeX, sizeY)
