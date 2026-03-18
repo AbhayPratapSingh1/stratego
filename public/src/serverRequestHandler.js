@@ -28,17 +28,30 @@ const handleLogin = async (name, reset) => {
 const sendWaitingRequest = async () => {
   const res = await waitingReq();
 
+  if (!res.ok) {
+    alert("Something bad happen contact developer");
+  }
   if (res.status === 204) {
     console.log("sending again");
     return sendWaitingRequest();
   }
-  if (res.status !== 200) {
-    alert("SOmethign bad happen contact developer");
-    console.log("here");
-  }
-
 
   gameState.state = "start-playing"
+
   gameState.resData = await res.json();
   return
+}
+
+const newUpdatesFetching = async (id) => {
+  const res = await newDataReq(id);
+  if (!res.ok) {
+    alert("Something bad happen contact developer");
+  }
+
+  if (res.status === 204) {
+    console.log("requesting again");
+    return newUpdatesFetching(id);
+  }
+
+  return await res.json();
 }

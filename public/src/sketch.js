@@ -13,6 +13,10 @@ const gameState = {
   waiting: {
     isMatchingStarted: false
   },
+  play: {
+    isLatest: false,
+    lastUpdatedId: -1,
+  },
   state: "login"
 }
 
@@ -99,9 +103,14 @@ async function draw() {
       waitingPage(); break;
 
     case "start-playing": {
+      if (!gameState.play.isLatest) {
+        gameState.play.isLatest = true;
+        updateData();
+      }
+
       background(100, 0, 200);
-      background(220)
       fill(1)
+
       // renderBoard(gameState.game.getBoard(), 10, 10);
       break;
     }

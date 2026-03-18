@@ -1,7 +1,8 @@
 const APIS = {
   LOGIN: "/login",
   UPDATE: "/update-game",
-  FIND_MATCHING: "/find-match"
+  FIND_MATCHING: "/find-match",
+  NEW_DATA: "/new-data"
 }
 
 const loginReq = (name) => {
@@ -13,4 +14,11 @@ const loginReq = (name) => {
 
 const waitingReq = () => {
   return fetch(APIS.FIND_MATCHING)
+}
+
+const newDataReq = (lastId) => {
+  return fetch(APIS.NEW_DATA, {
+    method: "POST",
+    body: JSON.stringify({ lastId })
+  })
 }
