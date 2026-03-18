@@ -15,7 +15,7 @@ class Game {
       { x: 7, y: 5 },
     ]
     this.matrix = Array.from({ length: 10 }, () => Array.from({ length: 10 }, () => ({ value: 0, bg: " " })))
-    this.addWater(this.matrix);
+    this.addWater();
     this.color = " ";
   }
 

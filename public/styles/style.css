@@ -1,0 +1,27 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+
+button {
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  padding: 4px 15px;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 255, 0.56);
+  color: white;
+  transform: translate(-50%, -50%);
+}
+
+input {
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  transform: translate(-50%, -50%);
+  padding: 5px 10px;
+  border-radius: 5px;
+
+}
+
+button:hover {
+  padding: 4px 15px;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 255, 0.842);
+}

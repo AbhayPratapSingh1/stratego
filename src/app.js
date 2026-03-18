@@ -4,6 +4,16 @@ import { setCookie, getCookie } from "hono/cookie"
 import { logger } from "hono/logger"
 import { Game } from "./game.js";
 
+const getPlayerSessionId = (name) => {
+  player.push(name);
+  return player.length++;
+
+}
+
+const handlePossibleGames = () => {
+  listners.forEach(res => res(1));
+}
+
 const TIMEOUT_TIME = 1000
 
 const player = [];
@@ -100,13 +110,19 @@ export const createApp = () => {
     return c.json({ board: game.getBoard(), color: player.indexOf(user) === 0 ? "R" : "G" })
   })
 
+
   app.post("/login", async (c) => {
     const { name } = await c.req.json();
+
+
     if (!name) {
       return c.text("Bad Request", 400);
     }
-    player.push(name);
-    setCookie(c, "username", name);
+
+    const sid = getPlayerSessionId(name);
+    handlePossibleGames();
+    setCookie(c, "username", sid);
+
     return c.json({ status: true });
   })
 
