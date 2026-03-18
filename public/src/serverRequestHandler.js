@@ -39,6 +39,7 @@ const sendWaitingRequest = async () => {
   gameState.state = "start-playing"
 
   gameState.resData = await res.json();
+  gameState.play.color = gameState.resData.color;
   return
 }
 

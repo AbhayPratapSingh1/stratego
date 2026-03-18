@@ -1,8 +1,9 @@
 
 class Game {
-  constructor(size) {
+  constructor(size, color = "R") {
+
     this.size = size
-    this.blockSize = this.size / CONSTANTS.blocks
+    this.blockSize = this.size / 10
     this.waterPos = [
       { x: 2, y: 4 },
       { x: 3, y: 4 },
@@ -14,18 +15,24 @@ class Game {
       { x: 6, y: 5 },
       { x: 7, y: 5 },
     ]
-    this.matrix = Array.from({ length: 10 }, () => Array.from({ length: 10 }, () => ({ value: 0, bg: " " })))
+    this.matrix = Array.from({ length: 10 }, () => Array.from({ length: 10 }, () => ({ value: -1, pieceColor: null })))
     this.addWater();
-    this.color = " ";
+
+    this.color = color;
   }
 
-  storeMatrix(matrix) {
-    this.matrix = matrix
+
+  setBoard(board) {
+    this.matrix = board
   }
+  setTurn(ownTurn) {
+    this.ownTurn = ownTurn;
+  }
+
 
   addWater() {
     this.waterPos.forEach(({ x, y }) => {
-      this.matrix[y][x] = { bg: "W", value: 0 }
+      this.matrix[y][x] = { value: 0, pieceColor: "W" }
     })
 
     return this
@@ -35,38 +42,39 @@ class Game {
     return this.matrix;
   }
 
-  addPiece(value, pos, player) {
-    let bg = "R";
-    if (player === 1) {
-      bg = "G";
-    }
-    this.matrix[pos.y][pos.x] = { bg, value }
-    return this
-  }
-  isValidPieceToMove(x, y) {
-    return this.color === this.matrix[y][x].bg;
-  }
+  // addPiece(value, pos, player) {
+  //   let bg = "R";
+  //   if (player === 1) {
+  //     bg = "G";
+  //   }
+  //   this.matrix[pos.y][pos.x] = { bg, value }
+  //   return this
+  // }
 
-  setRole(color) {
-    this.color = color;
-  }
+  // isValidPieceToMove(x, y) {
+  //   return this.color === this.matrix[y][x].bg;
+  // }
 
-  updatePos({ x, y }, newPos) {
-    const soilder = this.matrix[y][x];
-    this.matrix[newPos.y][newPos.x] = soilder
-    this.matrix[y][x] = { value: 0, bg: " " }
-    return this
-  }
+  // setRole(color) {
+  //   this.color = color;
+  // }
 
-  isWater(x, y) {
-    this.waterPos.some(pos => pos.x === x && pos.y === y)
-  }
+  // updatePos({ x, y }, newPos) {
+  //   const soilder = this.matrix[y][x];
+  //   this.matrix[newPos.y][newPos.x] = soilder
+  //   this.matrix[y][x] = { value: 0, bg: " " }
+  //   return this
+  // }
 
-  isOccupied(x, y) {
-    if (this.waterPos.some(pos => pos.x === x && pos.y === y)) {
-      return true
-    }
-    const value = this.matrix[y][x].value
-    return isNumber(value) && value !== 0
-  }
+  // isWater(x, y) {
+  //   this.waterPos.some(pos => pos.x === x && pos.y === y)
+  // }
+
+  // isOccupied(x, y) {
+  //   if (this.waterPos.some(pos => pos.x === x && pos.y === y)) {
+  //     return true
+  //   }
+  //   const value = this.matrix[y][x].value
+  //   return isNumber(value) && value !== 0
+  // }
 }

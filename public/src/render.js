@@ -1,6 +1,7 @@
 
 const renderBlock = (value, bg, sizeX, sizeY,) => {
   fill(bg)
+  stroke(0, 0, 0, 100)
   rect(0, 0, sizeX, sizeY)
   if (isNumber(value) && +value > 0) {
     push();
@@ -14,16 +15,18 @@ const renderBlock = (value, bg, sizeX, sizeY,) => {
   }
 }
 
-const renderBoard = (board, h, w) => {
+const renderBoard = (board, h = 10, w = 10) => {
   const sizeX = width / w;
   const sizeY = height / h;
-  const matrix = board
+  const matrix = board;
 
   push()
   for (let c = 0; c < w; c++) {
     push()
     for (let r = 0; r < h; r++) {
-      const { bg, value } = matrix[c][r]
+      const { pieceColor: bg, value } = matrix[c][r]
+      console.log({ bg, value });
+
       const bgColor = ICONS[bg] || bg
       renderBlock(value, bgColor, sizeX, sizeY)
       translate(sizeY, 0);

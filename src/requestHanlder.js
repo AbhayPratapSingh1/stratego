@@ -72,7 +72,7 @@ export const handleUpdates = async (c) => {
   }
 
   if (lastId < game.lastId) {
-    return c.json({ board: game.getBoard(), turn: game.getTurnOf(), lastId: game.lastId });
+    return c.json({ board: game.getBoard(), isPlayerTurn: userData.id === game.getTurnOf(), lastId: game.lastId });
   }
 
   return await new Promise((res, rej) => {
@@ -83,8 +83,33 @@ export const handleUpdates = async (c) => {
       rej("Request Time out");
     }, TIMEOUT)
 
-  }).then((board) => {
-    return c.json({ board: board, turn: game.getTurnOf(), lastId: game.lastId });
   })
+    .then((board) => {
+      return c.json({ board: board, isPlayerTurn: userData.id === game.getTurnOf(), lastId: game.lastId });
+    })
     .catch((e) => console.log("No new Data :", { e }) || c.text(null, 204))
+}
+
+
+export const handleSetPieces = async () => {
+  const userData = getUserDetail(c);
+  const { pieces } = await c.req.json();
+
+  if (!userData || pieces === undefined) {
+    return c.text("Bad Request", 404);
+  }
+
+  const game = c.get("games")[userData.roomId];
+
+  if (!game) {
+    return c.text("Bad Request", 404);
+  }
+
+  const result = game.setUserPieces(userData.id, pieces)
+
+  if (result.status !== 0) {
+    return c.text("Bad Request", 404);
+  }
+
+  return c.json({ status: true, message: "Added" })
 }

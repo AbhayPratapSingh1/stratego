@@ -13,7 +13,7 @@ const createRoom = (c, player1, player2) => {
   const game = new Game(roomId, player1, player2)
   games[roomId] = game;
 
-  return roomId
+  return { game, roomId }
 }
 
 export const isPlayerAvailable = (c, player) => {
@@ -22,14 +22,14 @@ export const isPlayerAvailable = (c, player) => {
   if (listners.length >= 1) {
     const player2 = listners.shift();
 
-    const roomId = createRoom(c, player, player2)
+    const { game, roomId } = createRoom(c, player, player2)
 
     const data = { roomId: roomId }
 
-    player2.resolveWaiting(data)
+    player2.resolveWaiting({ ...data, color: game.getColor(player2.id) })
     delete player2.resolveWaiting;
 
-    return { isPlayerGotPair: true, data }
+    return { isPlayerGotPair: true, data: { ...data, color: game.getColor(player.id) } }
   }
 
   return { isPlayerGotPair: false, data: {} }

@@ -1,7 +1,7 @@
 import { Hono } from "hono"
 import { serveStatic } from "hono/deno"
 import { logger } from "hono/logger"
-import { findMatchHanlder, handleUpdates, loginHandler } from "./requestHanlder.js";
+import { findMatchHanlder, handleSetPieces, handleUpdates, loginHandler } from "./requestHanlder.js";
 
 const players = [];
 const listners = [];
@@ -16,6 +16,7 @@ export const createApp = () => {
   const games = {}
 
   const app = new Hono()
+
   app.use(logger())
   app.use((c, next) => {
     c.set("players", players);
@@ -24,6 +25,8 @@ export const createApp = () => {
     c.set("games", games);
     return next()
   })
+
+  app.post("/set-pieces", handleSetPieces)
 
   app.post("/new-data", handleUpdates)
 

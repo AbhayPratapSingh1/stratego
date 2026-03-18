@@ -16,6 +16,9 @@ const gameState = {
   play: {
     isLatest: false,
     lastUpdatedId: -1,
+    color: null,
+    state: "placement",
+    isPieceChoosDialogOpen: false,
   },
   state: "login"
 }
@@ -91,9 +94,6 @@ const sendAction = async (from, to) => {
 }
 
 
-
-// const matrixHandler = matrixHanlderCreator()
-
 async function draw() {
   switch (gameState.state) {
     case "login":
@@ -105,13 +105,16 @@ async function draw() {
     case "start-playing": {
       if (!gameState.play.isLatest) {
         gameState.play.isLatest = true;
+        gameState.game = new Game(10, gameState.play.color);
         updateData();
       }
 
       background(100, 0, 200);
       fill(1)
-
-      // renderBoard(gameState.game.getBoard(), 10, 10);
+      renderBoard(gameState.game.getBoard());
+      if (isPieceChoosDialogOpen){
+        renderPieceChooseDialog()
+      }
       break;
     }
   }
