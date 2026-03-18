@@ -1,4 +1,8 @@
 const waitingPage = () => {
+  if (!gameState.waiting.isMatchingStarted) {
+    gameState.waiting.isMatchingStarted = true;
+    sendWaitingRequest();
+  }
   background(1)
   translate(width / 2, height / 2);
   textAlign(CENTER, CENTER);

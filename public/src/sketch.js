@@ -10,6 +10,9 @@ const gameState = {
   login: {
     isSetupDone: false,
   },
+  waiting: {
+    isMatchingStarted: false
+  },
   state: "login"
 }
 
@@ -85,7 +88,7 @@ const sendAction = async (from, to) => {
 
 
 
-const matrixHandler = matrixHanlderCreator()
+// const matrixHandler = matrixHanlderCreator()
 
 async function draw() {
   switch (gameState.state) {
@@ -99,12 +102,8 @@ async function draw() {
       background(100, 0, 200);
       background(220)
       fill(1)
-      renderBoard(gameState.game.getBoard(), 10, 10);
+      // renderBoard(gameState.game.getBoard(), 10, 10);
       break;
     }
   }
-
-  // if (!matrixHandler.isRendered()) {
-  //   matrixHandler.next()
-  // }
 }  

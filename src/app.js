@@ -1,22 +1,16 @@
 import { Hono } from "hono"
 import { serveStatic } from "hono/deno"
-import { setCookie, getCookie } from "hono/cookie"
+import { getCookie } from "hono/cookie"
 import { logger } from "hono/logger"
 import { Game } from "./game.js";
+import { loginHandler } from "./requestHanlder.js";
+import { handlePossibleGames } from "./gameManager.js";
 
-const getPlayerSessionId = (name) => {
-  player.push(name);
-  return player.length++;
 
-}
-
-const handlePossibleGames = () => {
-  listners.forEach(res => res(1));
-}
 
 const TIMEOUT_TIME = 1000
 
-const player = [];
+const players = [];
 const game = new Game()
 const piecesOne = "123456".split("").map((_, i) => ({ x: i, y: 0, value: i + 1 }));
 const piecesTwo = "123456".split("").map((_, i) => ({ x: i, y: 9, value: i + 1 }));
@@ -35,7 +29,7 @@ const handleGame = async (c) => {
     return c.text("Bad Request", 400);
   }
   try {
-    if (player.length < 2) {
+    if (players.length < 2) {
       await new Promise((resolve, reject) => {
         listners.push(resolve);
         setTimeout(() => {
@@ -48,7 +42,7 @@ const handleGame = async (c) => {
     return c.text(null, 204)
   }
 
-  if (user === player[turnOf]) {
+  if (user === players[turnOf]) {
     return c.json({ board: game.getBoard() })
   }
   const data = await new Promise((resolve, reject) => {
@@ -73,13 +67,17 @@ export const createApp = () => {
 
   const app = new Hono()
   app.use(logger())
-
+  app.use((c, next) => {
+    c.set("players", players);
+    c.set("listners", listners);
+    return next()
+  })
 
   app.post("/action", async (c) => {
 
     const user = getCookie(c, "username");
     const { action, data } = await c.req.json();
-    if (user !== player[turnOf] || !(action in ACTIONS)) {
+    if (user !== players[turnOf] || !(action in ACTIONS)) {
       return c.text("Bad Request", 400);
     }
 
@@ -95,7 +93,7 @@ export const createApp = () => {
       return c.text("Bad Request", 400);
     }
     try {
-      if (player.length < 2) {
+      if (players.length < 2) {
         await new Promise((resolve, reject) => {
           listners.push(resolve);
           setTimeout(() => {
@@ -107,23 +105,42 @@ export const createApp = () => {
       return c.text(null, 204)
     }
 
-    return c.json({ board: game.getBoard(), color: player.indexOf(user) === 0 ? "R" : "G" })
+    return c.json({ board: game.getBoard(), color: players.indexOf(user) === 0 ? "R" : "G" })
   })
 
 
-  app.post("/login", async (c) => {
-    const { name } = await c.req.json();
+  const getUserDetail = (c) => {
+    const sid = getCookie(c, "sid");
+    const players = c.get("players");
+    const playerDetail = players.find(({ id }) => sid.toString() === id.toString());
 
+    return playerDetail;
+  }
 
-    if (!name) {
-      return c.text("Bad Request", 400);
+  app.post("/login", loginHandler)
+
+  app.get("/find-match", async (c) => {
+    const playerDetail = getUserDetail(c)
+    const listener = c.get("listners");
+
+    listener.push(playerDetail)
+
+    const game = handlePossibleGames(c);
+    if (game.isPlayerGotPair) {
+      return c.json(game.data);
     }
 
-    const sid = getPlayerSessionId(name);
-    handlePossibleGames();
-    setCookie(c, "username", sid);
+    return await new Promise((res, rej) => {
+      playerDetail.resolveWaiting = res;
+      setTimeout(() => {
+        const playerIndex = listener.findIndex(each => each === playerDetail)
+        listener.splice(playerIndex, 1);
+        delete playerDetail.resolveWaiting;
+        rej(1);
+      }, 1000)
+    }).then((data) => c.json(data))
+      .catch((e) => console.log({ e }) || c.text(null, 204))
 
-    return c.json({ status: true });
   })
 
   app.get("*", serveStatic({ root: "public" }))

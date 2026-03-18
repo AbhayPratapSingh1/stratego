@@ -1,8 +1,6 @@
 
 
 const handleLogin = async (name, reset) => {
-  console.log("here");
-
   gameState.isLoading = true;
   const response = await loginReq(name)
   if (!response.ok) {
@@ -15,7 +13,8 @@ const handleLogin = async (name, reset) => {
       gameState.isLoading = false;
       return
     }
-
+    gameState.isLoading = false;
+    alert("Something went wrong contact owner!");
   }
 
 
@@ -23,4 +22,23 @@ const handleLogin = async (name, reset) => {
 
   gameState.state = "waiting"
   return await response.json();
+}
+
+
+const sendWaitingRequest = async () => {
+  const res = await waitingReq();
+
+  if (res.status === 204) {
+    console.log("sending again");
+    return sendWaitingRequest();
+  }
+  if (res.status !== 200) {
+    alert("SOmethign bad happen contact developer");
+    console.log("here");
+  }
+
+
+  gameState.state = "start-playing"
+  gameState.resData = await res.json();
+  return
 }
