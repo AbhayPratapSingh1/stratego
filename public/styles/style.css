@@ -46,7 +46,11 @@
   display: flex;
   justify-content: start;
   flex-wrap: wrap;
-  border: 1px solid red;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  min-height: 200px;
 }
 
 button {
@@ -63,6 +67,7 @@ button {
   background-color: blue;
   color: white;
   padding: 5px 10px;
+  height: max-content;
 }
 
 #save-placement:disabled {
