@@ -26,3 +26,11 @@ export const hideWaitingScreen = (message) => {
     modal.close();
   }
 };
+
+
+export const PIECE_COLOR_MAP = {
+  "W": "water",
+  "R": "red",
+  "B": "blue",
+  "X": "empty",
+}

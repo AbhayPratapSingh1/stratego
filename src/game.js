@@ -12,6 +12,7 @@ export class Game {
     this.#setGamePhase();
     this.matrix = Array.from({ length: 10 }, () => Array.from({ length: 10 }, () => ({ value: -1, id: null })))
     this.#addWater();
+    this.turnOf = player1.id
     this.piecesCount = {
       1: 1,
       2: 1,
@@ -27,13 +28,13 @@ export class Game {
   }
   getSetupPieces() {
     return [
-      { value: 1, count: 2 },
+      // { value: 1, count: 2 },
       // { value: 2, count: 2 },
       // { value: 3, count: 2 },
       // { value: 4, count: 2 },
       // { value: 5, count: 2 },
       // { value: 6, count: 2 },
-      // { value: 7, count: 1 },
+      { value: 7, count: 1 },
       // { value: 8, count: 1 },
       // { value: 9, count: 1 },
       // { value: 10, count: 1 },
@@ -162,11 +163,14 @@ export class Game {
       }
     }))
 
-    return this.getColor(id) === "B" ? newMatrix.reverse() : newMatrix;
+    return this.getColor(id) === "B" ? newMatrix.map(each => each.reverse()).reverse() : newMatrix;
   }
 
   getTurnOf() {
-    return this.player1.id
+    return this.turnOf
+  }
+  changeTurn() {
+    this.turnOf = this.turnOf === this.player1.id ? this.player2.id : this.player1.id
   }
 
   addListner(id, resolver) {
@@ -182,11 +186,40 @@ export class Game {
   }
 
   updateGame() {
+    console.log(this.matrix.map(each => each.map(({ value }) => value).join("")).join("\n"));
     this.lastId++;
     for (const id in this.listners) {
       const resolver = this.listners[id]
       const parsedId = Number(id);
       resolver(this.getBoard(parsedId));
     }
+  }
+
+  getPosition(id, { x, y }) {
+    if (this.getColor(id) === "B") {
+      return { x: 9 - x, y: 9 - y }
+    }
+    return { x, y }
+  }
+  updatePiece(id, from, to) {
+    if (id !== this.getTurnOf()) {
+      return { status: -1 }
+    }
+
+
+    const { x, y } = this.getPosition(id, from);
+    const { x: x2, y: y2 } = this.getPosition(id, to);
+
+    if (this.matrix[y][x].id !== id || this.isOccupied(y, x)) {
+      console.log("OCUUPIED");
+
+      return { status: -1, message: "Invalid Piece Selection" }
+    }
+    const { value } = this.matrix[y][x]
+    this.matrix[y2][x2] = { value, id };
+    this.matrix[y][x] = { value: -1, id: null };
+    this.changeTurn()
+    this.updateGame()
+    return { status: 0 }
   }
 } 

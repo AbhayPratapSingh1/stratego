@@ -1,3 +1,5 @@
+import { PIECE_COLOR_MAP } from "./utilities.js";
+
 export const renderBoard = () => {
   const board = document.querySelector("#board");
   for (let row = 0; row < 10; row++) {
@@ -14,14 +16,14 @@ export const renderBoard = () => {
 };
 
 
-const PIECE_COLOR_MAP = {
-  "W": "water",
-  "R": "red",
-  "B": "blue",
-  "X": "empty",
-}
 
 const setBoardBox = (gameState, box, value, pieceColor, row) => {
+  const color = box.dataset.color
+
+  if (color) {
+    const prevClass = PIECE_COLOR_MAP[box.dataset.color]
+    box.classList.remove(prevClass);
+  }
 
   const classToAdd = PIECE_COLOR_MAP[pieceColor]
 
@@ -29,6 +31,10 @@ const setBoardBox = (gameState, box, value, pieceColor, row) => {
   box.classList.add(classToAdd);
 
   box.dataset.notPlaceAble = pieceColor === gameState.selfColor;
+  box.dataset.value = value;
+  box.dataset.color = pieceColor;
+  box.dataset.placeAble = pieceColor !== gameState.selfColor && pieceColor !== "W";
+
   if (gameState.state === "placement") {
     box.dataset.notPlaceAble = pieceColor === "W" || row < 5 ? "true" : "false";
   }

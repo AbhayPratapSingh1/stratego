@@ -49,7 +49,7 @@ const getPiecesCount = (piece) => {
   for (const { count } of piece) {
     totalPieceCount += count;
   }
-  console.log({ totalPieceCount });
+
 
   return totalPieceCount
 

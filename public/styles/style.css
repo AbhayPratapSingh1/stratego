@@ -102,3 +102,7 @@ button {
   align-items: center;
   background-color: white;
 }
+
+.selected-box {
+  border: 2px solid black;
+}

@@ -71,7 +71,7 @@ export const handleUpdates = async (c) => {
   console.log({ lastId });
 
   if (lastId < game.lastId && lastId >= 0) {
-    return c.json({ board: game.getBoard(userData.id), isPlayerTurn: userData.id === game.getTurnOf(), lastId: game.lastId });
+    return c.json({ board: game.getBoard(userData.id), isTurn: userData.id === game.getTurnOf(), lastId: game.lastId });
   }
 
   return await new Promise((res, rej) => {
@@ -84,7 +84,7 @@ export const handleUpdates = async (c) => {
 
   })
     .then((board) => {
-      return c.json({ board: board, isPlayerTurn: userData.id === game.getTurnOf(), lastId: game.lastId });
+      return c.json({ board: board, isTurn: userData.id === game.getTurnOf(), lastId: game.lastId });
     })
     .catch((e) => {
       console.log("No new Data :", { e });
@@ -153,4 +153,42 @@ export const handleGetSetupPieces = (c) => {
 
   const pieces = game.getSetupPieces()
   return c.json({ pieces })
+}
+
+
+
+export const handleUserPieceAction = async (c) => {
+  const userData = getUserDetail(c);
+  const { from, to } = await c.req.json();
+
+  if (!userData || from === undefined || to === undefined) {
+    return c.text("Bad Request", 404);
+  }
+
+  const game = c.get("games")[userData.roomId];
+
+  if (!game) {
+    console.log({ game });
+    return c.text("Bad Request", 404);
+  }
+
+  const turnOf = game.getTurnOf();
+  if (turnOf !== userData.id) {
+    console.log("invalid user ", userData.id, turnOf);
+    return c.text("Bad Request", 404);
+  }
+
+  const { status, message } = game.updatePiece(userData.id, from, to)
+
+
+  if (status !== 0) {
+    return c.text("Bad Request", 404);
+  }
+
+
+  const board = game.getBoard();
+  console.log("MOVE PIECE IS CALLED ");
+
+
+  return c.json({ board, isTurn: userData.id === game.getTurnOf(), lastId: game.lastId })
 }

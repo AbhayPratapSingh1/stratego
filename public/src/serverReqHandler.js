@@ -1,8 +1,8 @@
 import { setupPiecesDetails, waitingReq, newDataReq } from "./serverReq.js";
 
-
 export const getPiecesDeatails = async () => {
   const res = await setupPiecesDetails();
+
   if (!res.ok) {
     alert("Something bad happen contact developer");
   }
@@ -10,6 +10,7 @@ export const getPiecesDeatails = async () => {
   const { pieces } = await res.json();
   return pieces;
 };
+
 export const waitForOpponent = async (gameState) => {
   const res = await waitingReq();
 
@@ -31,10 +32,8 @@ export const waitForOpponent = async (gameState) => {
 
   gameState.board = data.board;
   gameState.resData = data;
-  console.log(data.color);
 
   gameState.selfColor = data.color;
-
   gameState.state = "placement";
   return;
 };
