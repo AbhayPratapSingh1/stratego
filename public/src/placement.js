@@ -1,14 +1,14 @@
 import { renderBoard, updateBoard } from "./render.js";
 import { submitPiecePlacementReq } from "./serverReq.js";
 import { getPiecesDeatails } from "./serverReqHandler.js";
-import { displayWaitingScreen } from "./waiting.js";
+import { displayWaitingScreen } from "./utilities.js";
 
 
 const isAlreadyAssined = (id, gameState) => {
   return id in gameState.setupStore;
 }
 
-const createSaveButton = (_gameState) => {
+const createSaveButton = () => {
   const actionBox = document.querySelector("#action");
   const button = document.createElement("button")
   button.id = "save-placement";
@@ -39,7 +39,7 @@ const handlePiecePlacementSubmit = async (gameState) => {
 
 const setSubmitButtonListner = (gameState) => {
   const saveButton = document.querySelector("#save-placement");
-  saveButton.addEventListener("click", (e) => {
+  saveButton.addEventListener("click", () => {
     handlePiecePlacementSubmit(gameState)
   })
 }
@@ -56,24 +56,26 @@ const getPiecesCount = (piece) => {
 }
 
 export const handlePlacementMode = async (gameState) => {
+
   const pieces = await getPiecesDeatails();
 
   gameState.toConsume = getPiecesCount(pieces);
 
-  createAddingButtonsForPieces(gameState, pieces);
+  displayPlaceablePieces(gameState, pieces);
+  createSaveButton(gameState);
 
   renderBoard();
   updateBoard(gameState)
-  createSaveButton(gameState);
 
-  const moveNextPromise = new Promise((res) => {
+  const finishPlacement = new Promise((res) => {
     gameState.next = res;
   })
 
   setSubmitButtonListner(gameState);
-  setEventListnersToBoard(gameState);
+  setBoardPlacementEventListners(gameState);
 
-  await moveNextPromise;
+  await finishPlacement;
+
   return gameState;
 };
 
@@ -86,7 +88,7 @@ const setAddPieceButtonSpecifications = (button, value, count) => {
   button.disabled = count === 0;
 }
 
-const createAddingButtonsForPieces = (gameState, pieces) => {
+const displayPlaceablePieces = (gameState, pieces) => {
   const action = document.querySelector("#action");
   const options = document.createElement("div");
 
@@ -120,7 +122,7 @@ const createAddingButtonsForPieces = (gameState, pieces) => {
 };
 
 
-const setEventListnersToBoard = (gameState) => {
+const setBoardPlacementEventListners = (gameState) => {
   const board = document.querySelector("#board");
   const submitButton = document.querySelector("#save-placement");
 

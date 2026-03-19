@@ -1,25 +1,15 @@
+import { handleGameUpdates } from "./playGame.js";
 import { handlePlacementMode } from "./placement.js";
-import { updateBoard } from "./render.js";
-import { sendWaitingRequest, newUpdatesFetching } from "./serverReqHandler.js";
-import { clearActionBox, removeEventListener } from "./utilities.js";
-import { displayWaitingScreen, hideWaitingScreen } from "./waiting.js";
+import { waitForOpponent } from "./serverReqHandler.js";
+import { clearActionBox, removeEventListener, displayWaitingScreen, hideWaitingScreen } from "./utilities.js";
 
 const handleMatchMaking = async (gameState) => {
 
   displayWaitingScreen(gameState.MESSAGES.WAITING_OTHER_PLAYER_CONNECTION);
-  await sendWaitingRequest(gameState)
+  await waitForOpponent(gameState)
 
   hideWaitingScreen("")
   return gameState
-}
-
-const handleGameUpdates = async (gameState) => {
-  const data = await newUpdatesFetching(gameState.lastUpdatedId);
-  gameState.lastUpdatedId = data.lastId;
-  gameState.isPlayerTurn = data.isPlayerTurn;
-  gameState.board = data.board;
-  updateBoard(gameState)
-
 }
 
 const startPlaying = async (gameState) => {

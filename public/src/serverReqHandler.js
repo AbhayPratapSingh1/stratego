@@ -10,7 +10,7 @@ export const getPiecesDeatails = async () => {
   const { pieces } = await res.json();
   return pieces;
 };
-export const sendWaitingRequest = async (gameState) => {
+export const waitForOpponent = async (gameState) => {
   const res = await waitingReq();
 
   if (!res.ok) {
@@ -19,7 +19,7 @@ export const sendWaitingRequest = async (gameState) => {
 
   if (res.status === 204) {
     console.log("sending again");
-    return sendWaitingRequest(gameState);
+    return waitForOpponent(gameState);
   }
 
 

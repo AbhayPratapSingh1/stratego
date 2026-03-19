@@ -74,8 +74,6 @@ export class Game {
 
     if (Object.values(playersGamePhase).every((phase) => phase !== "placement")) {
       this.gamePhase.final = "play";
-      console.log("BOTH SUBMITTED THE PIECES, NOT SETTING PLAY MODE");
-
       this.updateGame();
     }
 
