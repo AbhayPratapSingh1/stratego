@@ -17,8 +17,7 @@ export const createApp = () => {
 
   const app = new Hono()
 
-  app.use(logger());
-
+  app.use(logger())
   app.use((c, next) => {
     c.set("players", players);
     c.set("listners", listners);

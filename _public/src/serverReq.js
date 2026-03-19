@@ -5,18 +5,18 @@ const APIS = {
   NEW_DATA: "/new-data"
 }
 
-export const loginReq = (name) => {
+const loginReq = (name) => {
   return fetch(APIS.LOGIN, {
     method: "POST",
     body: JSON.stringify({ name })
   })
 }
 
-export const waitingReq = () => {
+const waitingReq = () => {
   return fetch(APIS.FIND_MATCHING)
 }
 
-export const newDataReq = (lastId) => {
+const newDataReq = (lastId) => {
   return fetch(APIS.NEW_DATA, {
     method: "POST",
     body: JSON.stringify({ lastId })

@@ -2,9 +2,7 @@ import { getCookie, setCookie } from "hono/cookie";
 
 export const getUserDetail = (c) => {
   const sid = getCookie(c, "sid");
-  if (!sid && sid !== "0") {
-    return
-  }
+
   const players = c.get("players");
   const playerDetail = players.find(({ id }) => sid.toString() === id.toString());
 

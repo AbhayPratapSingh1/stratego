@@ -25,3 +25,40 @@ button:hover {
   border-radius: 4px;
   background-color: rgba(0, 0, 255, 0.842);
 }
+
+.board {
+  width: 90vh;
+  aspect-ratio: 1;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.white {
+  background-color: white;
+}
+
+.dark {
+  background-color: black;
+}
+
+.block {
+  width: 10%;
+  box-sizing: border-box;
+  aspect-ratio: 1;
+  border: 1px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.water {
+  background-color: blue;
+}
+
+.red {
+  background-color: rgba(255, 0, 0, 0.426);
+}
+
+.blue {
+  background-color: rgba(0, 0, 255, 0.426);
+}

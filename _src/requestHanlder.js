@@ -5,7 +5,8 @@ import { getPlayerId, getPlayerSessionId, getUserDetail, assignRoomId } from "./
 const TIMEOUT = 10000;
 
 export const loginHandler = async (c) => {
-  const name = (await c.req.formData()).get("name")
+
+  const { name } = await c.req.json();
 
   if (!name) {
     return c.text("Bad Request", 400);
@@ -19,13 +20,15 @@ export const loginHandler = async (c) => {
 
   setCookie(c, "sid", sid);
 
-  return c.redirect("/", 303);
+  return c.json({ status: true });
 }
+
+
 
 export const findMatchHanlder = async (c) => {
   const playerDetail = getUserDetail(c)
   if (!playerDetail) {
-    return c.json({ type: "redirect", data: {} })
+    return c.text("Bad request", 400);
   }
 
   const listener = c.get("listners");
@@ -33,7 +36,7 @@ export const findMatchHanlder = async (c) => {
 
   if (matching.isPlayerGotPair) {
     assignRoomId(c, playerDetail, matching.data.roomId);
-    return c.json({ type: "data", data: matching.data });
+    return c.json(matching.data);
   }
 
   return await new Promise((res, rej) => {
@@ -47,7 +50,7 @@ export const findMatchHanlder = async (c) => {
     }, TIMEOUT)
   }).then((data) => {
     assignRoomId(c, playerDetail, data.roomId);
-    return c.json({ type: "data", data });
+    return c.json(data);
   })
     .catch((e) => console.log("failed to find match :", { e }) || c.text(null, 204))
 
