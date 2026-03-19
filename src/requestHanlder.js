@@ -84,11 +84,14 @@ export const handleUpdates = async (c) => {
     .then((board) => {
       return c.json({ board: board, isPlayerTurn: userData.id === game.getTurnOf(), lastId: game.lastId });
     })
-    .catch((e) => console.log("No new Data :", { e }) || c.text(null, 204))
+    .catch((e) => {
+      console.log("No new Data :", { e });
+      return c.text(null, 204);
+    })
 }
 
 
-export const handleSetPieces = async () => {
+export const handleSetPieces = async (c) => {
   const userData = getUserDetail(c);
   const { pieces } = await c.req.json();
 
@@ -109,4 +112,21 @@ export const handleSetPieces = async () => {
   }
 
   return c.json({ status: true, message: "Added" })
+}
+
+export const handleGetSetupPieces = (c) => {
+  const userData = getUserDetail(c);
+
+  if (!userData) {
+    return c.text("Bad Request", 404);
+  }
+
+  const game = c.get("games")[userData.roomId];
+
+  if (!game) {
+    return c.text("Bad Request", 404);
+  }
+
+  const pieces = game.getSetupPieces()
+  return c.json({ pieces })
 }

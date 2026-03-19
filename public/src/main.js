@@ -1,39 +1,8 @@
-import { newDataReq, waitingReq } from "./serverReq.js";
-
-
-const sendWaitingRequest = async (gameState) => {
-  const res = await waitingReq();
-  console.log("here");
-
-
-
-  if (!res.ok) {
-    alert("Something bad happen contact developer");
-  }
-
-
-
-  if (res.status === 204) {
-    console.log("sending again");
-    return sendWaitingRequest(gameState);
-  }
-
-  gameState.state = "start-playing"
-
-  const { data, type } = await res.json();
-  if (type === "redirect") {
-    window.location.href = "/login.html"
-    return
-  }
-
-  gameState.resData = data;
-  gameState.play.color = gameState.resData.color;
-  return
-}
-
+import { sendWaitingRequest, newUpdatesFetching, getPiecesDeatails } from "./serverReqHandler.js";
 
 const renderWaitingPage = () => {
-  const body = document.querySelector(".board")
+  const body = document.querySelector("#board")
+
   // body.classList.remove("white");
   // body.classList.add("dark");
 }
@@ -44,21 +13,6 @@ const handleWaitingTime = (gameState) => {
 }
 
 
-const newUpdatesFetching = async (id) => {
-  const res = await newDataReq(id);
-
-  if (!res.ok) {
-    alert("Something bad happen contact developer");
-  }
-
-  if (res.status === 204) {
-    console.log("requesting again");
-    return newUpdatesFetching(id);
-  }
-
-  return await res.json();
-}
-
 
 const updateBoard = (gameState) => {
   const board = gameState.board
@@ -66,7 +20,8 @@ const updateBoard = (gameState) => {
     for (let col = 0; col < 10; col++) {
       const box = document.querySelector(`#box-${row}-${col}`);
       const detail = board[row][col]
-      box.innerText = detail.value === 0 ? " " : detail.value;
+
+      box.textContent = detail.value === 0 ? " " : detail.value;
       switch (detail.pieceColor) {
         case "W":
           box.classList.add("water");
@@ -93,52 +48,130 @@ const handleGameUpdates = async (gameState) => {
 }
 
 const renderBoard = () => {
-  const board = document.querySelector(".board")
+  const board = document.querySelector("#board")
   for (let row = 0; row < 10; row++) {
     for (let col = 0; col < 10; col++) {
 
       const newElement = document.createElement("div");
       newElement.id = `box-${row}-${col}`;
       newElement.classList.add("block");
-      newElement.innerText = "1"
+      newElement.textContent = " ";
       board.append(newElement);
     }
   }
+}
 
+const createAddingButtonsForPieces = (gameState, pieces) => {
+  const action = document.querySelector("#action");
+  for (const { value, count } of pieces) {
+    const button = document.createElement("button");
+    button.id = `type-${value}`;
+    button.textContent = `${value} (${count})`;
+    button.dataset.type = "piece-button"
+    button.dataset.value = value;
+    button.dataset.count = count;
+    action.append(button);
+  }
+
+  gameState.events.selectPiece = (e) => {
+    const button = e.target;
+    if (button.dataset.type === "piece-button") {
+      const prevButton = gameState.selectedPiece;
+
+      if (prevButton) {
+        prevButton.classList.remove("selected-piece-btn");
+      }
+
+      gameState.selectedPiece = button;
+      button.classList.add("selected-piece-btn");
+    }
+  }
+
+  action.addEventListener("click", gameState.events.selectPiece)
+}
+
+const isAlreadyAssined = (id, gameState) => {
+  return id in gameState.setupStore
+}
+
+
+const setEventListnersToBoard = (gameState) => {
+  const board = document.querySelector("#board")
+
+  gameState.events.setUpBoardForBoard = (c) => {
+    const block = c.target;
+    const selectedPiece = gameState.selectedPiece
+    if (selectedPiece) {
+
+      const { value, count } = selectedPiece.dataset;
+
+      selectedPiece.textContent = `${value} (${count - 1})`
+      selectedPiece.classList.remove("selected-piece-btn");
+      selectedPiece.dataset.count = count - 1;
+
+      if (count === "1") {
+        selectedPiece.disabled = true;
+      }
+
+      if (isAlreadyAssined(block.id, gameState)) {
+        const prevValue = gameState.setupStore[block.id];
+        const button = document.querySelector(`#type-${prevValue}`)
+
+        const count = +button.dataset.count;
+        button.dataset.count = count + 1;
+        button.textContent = `${prevValue} (${count + 1})`
+        if (button.disabled) {
+          button.disabled = false;
+        }
+      }
+
+      gameState.setupStore[block.id] = value;
+      block.textContent = value;
+      gameState.selectedPiece = null;
+      return;
+    }
+
+    if (isAlreadyAssined(block.id, gameState)) {
+      const prevValue = gameState.setupStore[block.id];
+      const button = document.querySelector(`#type-${prevValue}`)
+
+      const count = +button.dataset.count;
+      button.dataset.count = count + 1;
+      button.textContent = `${prevValue} (${count + 1})`
+      if (button.disabled) {
+        button.disabled = false;
+      }
+
+      block.textContent = "";
+      delete gameState.setupStore[block.id];
+    }
+  }
+  board.addEventListener("click", gameState.events.setUpBoardForBoard);
+}
+
+const handlePlacementMode = async (gameState) => {
+
+  const pieces = await getPiecesDeatails();
+  gameState.pieces = pieces;
+
+  createAddingButtonsForPieces(gameState, pieces);
+  renderBoard();
+  setEventListnersToBoard(gameState);
+  return;
 }
 
 const startPlaying = (gameState) => {
-  handleGameUpdates(gameState)
-  renderBoard();
 
-  // if (!gameState.play.isLatest) {
-  //       gameState.play.isLatest = true;
-  //       gameState.game = new Game(10, gameState.play.color);
-  //       updateData();
-  //     }
-  //     background(100, 0, 200);
-  //     fill(1)
-  //     renderBoard(gameState.game.getBoard());
-  //     if (isPieceChoosDialogOpen) {
-  //       renderPieceChooseDialog()
-  //     }
-  //     break;
-  // }
 }
-
 
 window.onload = () => {
   const gameState = {
-    isWaiting: true,
-    isLoading: true,
-    game: null,
-    selected: { x: -1, y: -1 },
-    isTurn: true,
-    login: {
-      isSetupDone: false,
-    },
-    waiting: {
-      isMatchingStarted: false
+    state: "login",
+    pieces: null,
+    selectedPiece: null,
+    setupStore: {},
+    events: {
+      selectPiece: null
     },
     play: {
       isLatest: false,
@@ -147,29 +180,13 @@ window.onload = () => {
       state: "placement",
       isPieceChoosDialogOpen: false,
     },
-    state: "login"
   }
 
   handleWaitingTime(gameState)
     .then(() => {
+      handlePlacementMode(gameState);
+    })
+    .then(() => {
       startPlaying(gameState);
     });
-
-
-  //   case "start-playing": {
-  //     if (!gameState.play.isLatest) {
-  //       gameState.play.isLatest = true;
-  //       gameState.game = new Game(10, gameState.play.color);
-  //       updateData();
-  //     }
-
-  //     background(100, 0, 200);
-  //     fill(1)
-  //     renderBoard(gameState.game.getBoard());
-  //     if (isPieceChoosDialogOpen) {
-  //       renderPieceChooseDialog()
-  //     }
-  //     break;
-  //   }
-  // }
 }

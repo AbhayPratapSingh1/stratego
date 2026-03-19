@@ -21,6 +21,20 @@ export class Game {
       10: 1,
     }
   }
+  getSetupPieces() {
+    return [
+      { value: 1, count: 2 },
+      { value: 2, count: 2 },
+      { value: 3, count: 2 },
+      { value: 4, count: 2 },
+      { value: 5, count: 2 },
+      { value: 6, count: 2 },
+      { value: 7, count: 1 },
+      { value: 8, count: 1 },
+      { value: 9, count: 1 },
+      { value: 10, count: 1 },
+    ]
+  }
 
 
   getColor(id) {
@@ -59,13 +73,13 @@ export class Game {
   }
 
   #setPiece(pieces) {
-    for (const { x, y, v } of pieces) {
-      this.piecesCount[v]--;
-      if (this.piecesCount[v] < 0 || this.isOccupied(x, y)) {
-        throw new Error("Invalid pieces valus");
-      }
-      this.matrix[y][x] === v;
-    }
+    // for (const { x, y, v } of pieces) {
+    //   this.piecesCount[v]--;
+    //   if (this.piecesCount[v] < 0 || this.isOccupied(x, y)) {
+    //     throw new Error("Invalid pieces valus");
+    //   }
+    //   this.matrix[y][x] === v;
+    // }
   }
 
   isOccupied(x, y) {

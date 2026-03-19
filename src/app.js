@@ -1,7 +1,7 @@
 import { Hono } from "hono"
 import { serveStatic } from "hono/deno"
 import { logger } from "hono/logger"
-import { findMatchHanlder, handleSetPieces, handleUpdates, loginHandler } from "./requestHanlder.js";
+import { findMatchHanlder, handleGetSetupPieces, handleSetPieces, handleUpdates, loginHandler } from "./requestHanlder.js";
 
 const players = [];
 const listners = [];
@@ -27,13 +27,13 @@ export const createApp = () => {
     return next()
   })
 
+
   app.post("/set-pieces", handleSetPieces)
-
   app.post("/new-data", handleUpdates)
-
-  app.get("/find-match", findMatchHanlder);
-
   app.post("/login", loginHandler)
+
+  app.get("/setup-pieces", handleGetSetupPieces);
+  app.get("/find-match", findMatchHanlder);
 
   app.get("*", serveStatic({ root: "public" }))
 
