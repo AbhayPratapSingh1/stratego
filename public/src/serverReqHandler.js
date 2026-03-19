@@ -22,7 +22,6 @@ export const sendWaitingRequest = async (gameState) => {
     return sendWaitingRequest(gameState);
   }
 
-  gameState.state = "start-playing";
 
   const { data, type } = await res.json();
   if (type === "redirect") {
@@ -30,8 +29,11 @@ export const sendWaitingRequest = async (gameState) => {
     return;
   }
 
+  gameState.board = data.board;
   gameState.resData = data;
   gameState.play.color = gameState.resData.color;
+
+  gameState.state = "placement";
   return;
 };
 

@@ -1,4 +1,4 @@
-import { renderBoard } from "./render.js";
+import { renderBoard, updateBoard } from "./render.js";
 import { submitPiecePlacementReq } from "./serverReq.js";
 import { getPiecesDeatails } from "./serverReqHandler.js";
 import { showWaitingScreen, stopWaitingScreen } from "./waiting.js";
@@ -33,7 +33,7 @@ const handlePiecePlacementSubmit = async (gameState) => {
 
   showWaitingScreen(gameState.MESSAGES.SENDING_PIECE_SETUP)
   await submitPiecePlacementReq(placements);
-  
+
 
   gameState.currentEventResolver();
 }
@@ -57,13 +57,13 @@ const getPiecesCount = (piece) => {
 }
 
 export const handlePlacementMode = async (gameState) => {
-
   const pieces = await getPiecesDeatails();
   gameState.toConsume = getPiecesCount(pieces);
   gameState.pieces = pieces;
 
   createAddingButtonsForPieces(gameState, pieces);
   renderBoard();
+  updateBoard(gameState)
 
   createSaveButton(gameState);
 
@@ -124,6 +124,10 @@ const setEventListnersToBoard = (gameState) => {
   gameState.events.setUpBoardForBoard = (c) => {
     const block = c.target;
     const selectedPiece = gameState.selectedPiece;
+    if (block.dataset.notPlaceAble !== "false") {
+
+      return;
+    }
 
     if (isAlreadyAssined(block.id, gameState)) {
       const prevValue = gameState.setupStore[block.id];

@@ -56,13 +56,14 @@ export class Game {
   }
 
   setUserPieces(id, pieces) {
-    const playersGamePhase = this.gamePhase.players
+    const playersGamePhase = this.gamePhase.players;
+    const isRed = this.getColor(id) === "R";
     if (playersGamePhase[id] !== "placement") {
       return { status: -1, message: "Invalid Action" };
     }
 
     try {
-      this.#setPiece(id, pieces);
+      this.#setPiece(id, pieces, isRed);
     } catch (e) {
       console.log(e);
 
@@ -81,13 +82,16 @@ export class Game {
     return { status: 0, message: "setted piece for player" };
   }
 
-  #setPiece(id, pieces) {
+  #setPiece(id, pieces, isRed = false) {
     const totalPieces = this.getSetupPieces();
 
     for (const { x, y, value } of pieces) {
-
       if (!isNumber(x) || !isNumber(y) || !isNumber(value)) {
         throw new Error("Invalid pieces values");
+      }
+
+      if (y < 5) {
+        throw new Error("Invalid pieces Position");
       }
 
       const piece = totalPieces.find(piece => piece.value === value);
@@ -97,7 +101,9 @@ export class Game {
         throw new Error("Invalid pieces count/placement");
       }
 
-      this.matrix[y][x] = { value, id };
+      const xPos = isRed ? x : 9 - x;
+      const yPos = isRed ? y : 9 - y;
+      this.matrix[yPos][xPos] = { value, id };
     }
 
     if (this.#isAnyPieceLeft(totalPieces)) {
@@ -146,22 +152,19 @@ export class Game {
     const p2Color = p1Color === "R" ? "B" : "R";
 
     const newMatrix = this.matrix.map(row => row.map(({ id, value }) => {
-      if (id === p1Id) {
-        return { value, pieceColor: p1Color }
+      switch (id) {
+        case p1Id:
+          return { value, pieceColor: p1Color }
+        case p2Id:
+          return { value: 0, pieceColor: p2Color }
+        case "water":
+          return { value: 0, pieceColor: "W" }
+        default:
+          return { value: 0, pieceColor: "X" }
       }
-
-      if (id === p2Id) {
-        return { value: 0, pieceColor: p2Color }
-      }
-
-      if (id === "water") {
-        return { value: 0, pieceColor: "W" }
-      }
-
-      return { value: 0, pieceColor: "X" }
     }))
 
-    return newMatrix;
+    return this.getColor(id) === "B" ? newMatrix.reverse() : newMatrix;
   }
 
   getTurnOf() {
@@ -184,8 +187,6 @@ export class Game {
     this.lastId++;
     for (const id in this.listners) {
       const resolver = this.listners[id]
-      console.log({ id });
-
       const parsedId = Number(id);
       resolver(this.getBoard(parsedId));
     }
