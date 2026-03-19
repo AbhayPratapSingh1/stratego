@@ -1,3 +1,7 @@
+import { isNumber } from "./utilities.js";
+
+
+
 export class Game {
   constructor(roomId, player1, player2) {
     this.player1 = player1;
@@ -24,15 +28,15 @@ export class Game {
   getSetupPieces() {
     return [
       { value: 1, count: 2 },
-      { value: 2, count: 2 },
-      { value: 3, count: 2 },
-      { value: 4, count: 2 },
-      { value: 5, count: 2 },
-      { value: 6, count: 2 },
-      { value: 7, count: 1 },
-      { value: 8, count: 1 },
-      { value: 9, count: 1 },
-      { value: 10, count: 1 },
+      // { value: 2, count: 2 },
+      // { value: 3, count: 2 },
+      // { value: 4, count: 2 },
+      // { value: 5, count: 2 },
+      // { value: 6, count: 2 },
+      // { value: 7, count: 1 },
+      // { value: 8, count: 1 },
+      // { value: 9, count: 1 },
+      // { value: 10, count: 1 },
     ]
   }
 
@@ -54,11 +58,14 @@ export class Game {
   setUserPieces(id, pieces) {
     const playersGamePhase = this.gamePhase.players
     if (playersGamePhase[id] !== "placement") {
-      return -1;
+      return { status: -1, message: "Invalid Action" };
     }
+
     try {
-      this.#setPiece(pieces)
+      this.#setPiece(id, pieces);
     } catch (e) {
+      console.log(e);
+
       return { status: -1, message: "Invalid pieces Type/count" }
     }
 
@@ -66,20 +73,45 @@ export class Game {
 
     if (Object.values(playersGamePhase).every((phase) => phase !== "placement")) {
       this.gamePhase.final = "play";
+      console.log("BOTH SUBMITTED THE PIECES, NOT SETTING PLAY MODE");
+
       this.updateGame();
     }
 
-    return { status: -1, message: "Invalid pieces Type/count" };
+    return { status: 0, message: "setted piece for player" };
   }
 
-  #setPiece(pieces) {
-    // for (const { x, y, v } of pieces) {
-    //   this.piecesCount[v]--;
-    //   if (this.piecesCount[v] < 0 || this.isOccupied(x, y)) {
-    //     throw new Error("Invalid pieces valus");
-    //   }
-    //   this.matrix[y][x] === v;
-    // }
+  #setPiece(id, pieces) {
+    const totalPieces = this.getSetupPieces();
+
+    for (const { x, y, value } of pieces) {
+
+      if (!isNumber(x) || !isNumber(y) || !isNumber(value)) {
+        throw new Error("Invalid pieces values");
+      }
+
+      const piece = totalPieces.find(piece => piece.value === value);
+      piece.count--;
+
+      if (piece.count < 0 || this.isOccupied(x, y)) {
+        throw new Error("Invalid pieces count/placement");
+      }
+
+      this.matrix[y][x] = { value, id };
+    }
+
+    if (this.#isAnyPieceLeft(totalPieces)) {
+      throw new Error("Invalid pieces utilization");
+    }
+  }
+
+  #isAnyPieceLeft(pieces) {
+    for (const { count } of pieces) {
+      if (count !== 0) {
+        return true;
+      }
+    }
+    return false
   }
 
   isOccupied(x, y) {
@@ -150,8 +182,12 @@ export class Game {
 
   updateGame() {
     this.lastId++;
-    for (const resolver of this.listners) {
-      resolver(this.getData())
+    for (const id in this.listners) {
+      const resolver = this.listners[id]
+      console.log({ id });
+
+      const parsedId = Number(id);
+      resolver(this.getBoard(parsedId));
     }
   }
 } 

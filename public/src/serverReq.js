@@ -3,7 +3,8 @@ const APIS = {
   UPDATE: "/update-game",
   FIND_MATCHING: "/find-match",
   NEW_DATA: "/new-data",
-  SETUP_PIECES: "/setup-pieces",
+  GET_SETUP_PIECES: "/get-setup-pieces",
+  SET_PIECES: "/set-pieces",
 }
 
 export const loginReq = (name) => {
@@ -26,5 +27,13 @@ export const newDataReq = (lastId) => {
 }
 
 export const setupPiecesDetails = () => {
-  return fetch(APIS.SETUP_PIECES)
+  return fetch(APIS.GET_SETUP_PIECES)
+}
+
+
+export const submitPiecePlacementReq = (setup) => {
+  return fetch(APIS.SET_PIECES, {
+    method: "POST",
+    body: JSON.stringify({ setup })
+  })
 }

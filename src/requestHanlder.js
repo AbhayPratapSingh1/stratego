@@ -1,6 +1,6 @@
 import { setCookie } from "hono/cookie";
 import { isPlayerAvailable } from "./gameManager.js";
-import { getPlayerId, getPlayerSessionId, getUserDetail, assignRoomId } from "./utilities.js";
+import { getPlayerId, getPlayerSessionId, getUserDetail, assignRoomId, isNumber } from "./utilities.js";
 
 const TIMEOUT = 10000;
 
@@ -68,8 +68,10 @@ export const handleUpdates = async (c) => {
     return c.text("Bad Request", 404);
   }
 
-  if (lastId < game.lastId) {
-    return c.json({ board: game.getBoard(), isPlayerTurn: userData.id === game.getTurnOf(), lastId: game.lastId });
+  console.log({ lastId });
+
+  if (lastId < game.lastId && lastId >= 0) {
+    return c.json({ board: game.getBoard(userData.id), isPlayerTurn: userData.id === game.getTurnOf(), lastId: game.lastId });
   }
 
   return await new Promise((res, rej) => {
@@ -91,23 +93,45 @@ export const handleUpdates = async (c) => {
 }
 
 
+const parseSetup = (setup) => {
+  return setup.map(({ x, y, value }) => ({ x: Number(x), y: Number(y), value: Number(value), }))
+}
+
+
+const isValidSetup = (setup) => {
+  for (const { x, y, value } of setup) {
+    if (!isNumber(x) || !isNumber(y) || !isNumber(value)) {
+      return false;
+    }
+  }
+  return true;
+}
 export const handleSetPieces = async (c) => {
   const userData = getUserDetail(c);
-  const { pieces } = await c.req.json();
+  const { setup } = await c.req.json();
 
-  if (!userData || pieces === undefined) {
+  if (!userData || setup === undefined) {
     return c.text("Bad Request", 404);
   }
 
   const game = c.get("games")[userData.roomId];
 
   if (!game) {
+    console.log({ game });
     return c.text("Bad Request", 404);
   }
 
-  const result = game.setUserPieces(userData.id, pieces)
+  const parsedSetup = parseSetup(setup);
+
+  if (!isValidSetup(parsedSetup)) {
+    console.log("Invalid setip");
+
+    return c.text("Bad Request", 404);
+  }
+  const result = game.setUserPieces(userData.id, parsedSetup)
 
   if (result.status !== 0) {
+    console.log({ result });
     return c.text("Bad Request", 404);
   }
 

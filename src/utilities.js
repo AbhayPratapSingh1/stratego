@@ -1,5 +1,6 @@
 import { getCookie, setCookie } from "hono/cookie";
 
+export const isNumber = (val) => /^\d+$/.test(val);
 export const getUserDetail = (c) => {
   const sid = getCookie(c, "sid");
   if (!sid && sid !== "0") {
@@ -21,6 +22,7 @@ export const getPlayerId = (c) => {
   const players = c.get("players");
   return players.length + 1
 }
+
 
 export const assignRoomId = (c, playerDetail, roomId) => {
   playerDetail.roomId = roomId;

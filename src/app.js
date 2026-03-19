@@ -28,11 +28,11 @@ export const createApp = () => {
   })
 
 
-  app.post("/set-pieces", handleSetPieces)
   app.post("/new-data", handleUpdates)
   app.post("/login", loginHandler)
+  app.post("/set-pieces", handleSetPieces)
 
-  app.get("/setup-pieces", handleGetSetupPieces);
+  app.get("/get-setup-pieces", handleGetSetupPieces);
   app.get("/find-match", findMatchHanlder);
 
   app.get("*", serveStatic({ root: "public" }))
