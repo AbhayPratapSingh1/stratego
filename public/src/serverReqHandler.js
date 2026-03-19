@@ -31,7 +31,9 @@ export const sendWaitingRequest = async (gameState) => {
 
   gameState.board = data.board;
   gameState.resData = data;
-  gameState.play.color = gameState.resData.color;
+  console.log(data.color);
+
+  gameState.selfColor = data.color;
 
   gameState.state = "placement";
   return;

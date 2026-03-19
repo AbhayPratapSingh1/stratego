@@ -1,7 +1,7 @@
 import { renderBoard, updateBoard } from "./render.js";
 import { submitPiecePlacementReq } from "./serverReq.js";
 import { getPiecesDeatails } from "./serverReqHandler.js";
-import { showWaitingScreen, stopWaitingScreen } from "./waiting.js";
+import { showWaitingScreen } from "./waiting.js";
 
 
 const isAlreadyAssined = (id, gameState) => {
@@ -21,21 +21,20 @@ const createSaveButton = (_gameState) => {
 const handlePiecePlacementSubmit = async (gameState) => {
   const setup = gameState.setupStore;
   const placements = [];
+
   for (const boxId in setup) {
     const element = document.querySelector(`#${boxId}`);
-    const x = element.dataset.x;
-    const y = element.dataset.y;
+    const { x, y } = element.dataset
     const value = setup[boxId];
 
     placements.push({ x, y, value });
   }
 
-
   showWaitingScreen(gameState.MESSAGES.SENDING_PIECE_SETUP)
+
   await submitPiecePlacementReq(placements);
 
-
-  gameState.currentEventResolver();
+  gameState.next();
 }
 
 const setSubmitButtonListner = (gameState) => {
@@ -58,22 +57,24 @@ const getPiecesCount = (piece) => {
 
 export const handlePlacementMode = async (gameState) => {
   const pieces = await getPiecesDeatails();
+
   gameState.toConsume = getPiecesCount(pieces);
-  gameState.pieces = pieces;
 
   createAddingButtonsForPieces(gameState, pieces);
+
   renderBoard();
   updateBoard(gameState)
-
   createSaveButton(gameState);
 
   const moveNextPromise = new Promise((res) => {
-    gameState.currentEventResolver = res;
+    gameState.next = res;
   })
 
   setSubmitButtonListner(gameState);
   setEventListnersToBoard(gameState);
-  return moveNextPromise;
+
+  await moveNextPromise;
+  return gameState;
 };
 
 const setAddPieceButtonSpecifications = (button, value, count) => {
@@ -117,6 +118,7 @@ const createAddingButtonsForPieces = (gameState, pieces) => {
   action.addEventListener("click", gameState.events.selectPiece);
 };
 
+
 const setEventListnersToBoard = (gameState) => {
   const board = document.querySelector("#board");
   const submitButton = document.querySelector("#save-placement");
@@ -125,7 +127,6 @@ const setEventListnersToBoard = (gameState) => {
     const block = c.target;
     const selectedPiece = gameState.selectedPiece;
     if (block.dataset.notPlaceAble !== "false") {
-
       return;
     }
 
