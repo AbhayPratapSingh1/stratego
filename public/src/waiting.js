@@ -1,4 +1,4 @@
-export const showWaitingScreen = (message) => {
+export const displayWaitingScreen = (message) => {
   const modal = document.querySelector("#message-modal")
   const desciptionBox = modal.querySelector("h2");
   desciptionBox.textContent = message
@@ -7,7 +7,7 @@ export const showWaitingScreen = (message) => {
   }
 }
 
-export const stopWaitingScreen = (message) => {
+export const hideWaitingScreen = (message) => {
   const modal = document.querySelector("#message-modal")
   const desciptionBox = modal.querySelector("h2");
   desciptionBox.textContent = message

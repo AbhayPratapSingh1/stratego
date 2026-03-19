@@ -1,15 +1,15 @@
 import { handlePlacementMode } from "./placement.js";
 import { updateBoard } from "./render.js";
 import { sendWaitingRequest, newUpdatesFetching } from "./serverReqHandler.js";
-import { showWaitingScreen, stopWaitingScreen } from "./waiting.js";
+import { clearActionBox, removeEventListener } from "./utilities.js";
+import { displayWaitingScreen, hideWaitingScreen } from "./waiting.js";
 
 const handleMatchMaking = async (gameState) => {
 
-  showWaitingScreen(gameState.MESSAGES.WAITING_OTHER_PLAYER_CONNECTION);
-
+  displayWaitingScreen(gameState.MESSAGES.WAITING_OTHER_PLAYER_CONNECTION);
   await sendWaitingRequest(gameState)
 
-  stopWaitingScreen("")
+  hideWaitingScreen("")
   return gameState
 }
 
@@ -24,9 +24,8 @@ const handleGameUpdates = async (gameState) => {
 
 const startPlaying = async (gameState) => {
   await handleGameUpdates(gameState)
-  stopWaitingScreen("");
+  hideWaitingScreen("");
 }
-
 
 window.onload = () => {
   const gameState = {
@@ -38,10 +37,7 @@ window.onload = () => {
     selfColor: null,
     lastUpdatedId: 0,
 
-    events: {
-      setUpBoardForBoard: null,
-      selectPiece: null
-    },
+    events: [],
 
     MESSAGES: {
       SENDING_PIECE_SETUP: "Waiting For other player to finish setup",
@@ -51,5 +47,10 @@ window.onload = () => {
 
   handleMatchMaking(gameState)
     .then(handlePlacementMode)
+    .then((args) => {
+      clearActionBox();
+      removeEventListener(gameState.events);
+      return args
+    })
     .then(startPlaying);
 }

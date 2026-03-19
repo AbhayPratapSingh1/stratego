@@ -1,7 +1,7 @@
 import { renderBoard, updateBoard } from "./render.js";
 import { submitPiecePlacementReq } from "./serverReq.js";
 import { getPiecesDeatails } from "./serverReqHandler.js";
-import { showWaitingScreen } from "./waiting.js";
+import { displayWaitingScreen } from "./waiting.js";
 
 
 const isAlreadyAssined = (id, gameState) => {
@@ -30,7 +30,7 @@ const handlePiecePlacementSubmit = async (gameState) => {
     placements.push({ x, y, value });
   }
 
-  showWaitingScreen(gameState.MESSAGES.SENDING_PIECE_SETUP)
+  displayWaitingScreen(gameState.MESSAGES.SENDING_PIECE_SETUP)
 
   await submitPiecePlacementReq(placements);
 
@@ -101,7 +101,7 @@ const createAddingButtonsForPieces = (gameState, pieces) => {
   options.append(...buttons);
   action.appendChild(options);
 
-  gameState.events.selectPiece = (e) => {
+  const selectPieceEvent = (e) => {
     const button = e.target;
     if (button.dataset.type === "piece-button") {
       const prevButton = gameState.selectedPiece;
@@ -115,7 +115,8 @@ const createAddingButtonsForPieces = (gameState, pieces) => {
     }
   };
 
-  action.addEventListener("click", gameState.events.selectPiece);
+  gameState.events.push({ selector: "#action", eventType: "click", fn: selectPieceEvent })
+  action.addEventListener("click", selectPieceEvent);
 };
 
 
@@ -123,7 +124,7 @@ const setEventListnersToBoard = (gameState) => {
   const board = document.querySelector("#board");
   const submitButton = document.querySelector("#save-placement");
 
-  gameState.events.setUpBoardForBoard = (c) => {
+  const setUpBoardForBoard = (c) => {
     const block = c.target;
     const selectedPiece = gameState.selectedPiece;
     if (block.dataset.notPlaceAble !== "false") {
@@ -157,5 +158,7 @@ const setEventListnersToBoard = (gameState) => {
     submitButton.disabled = isAllConsumed;
   };
 
-  board.addEventListener("click", gameState.events.setUpBoardForBoard);
+  board.addEventListener("click", setUpBoardForBoard);
+
+  gameState.events.push({ selector: "#board", eventType: "click", fn: setUpBoardForBoard })
 };
