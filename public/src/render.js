@@ -1,6 +1,6 @@
 import { PIECE_COLOR_MAP } from "./utilities.js";
 
-export const renderBoard = () => {
+export const renderBoard = (gameState) => {
   const board = document.querySelector("#board");
   for (let row = 0; row < 10; row++) {
     for (let col = 0; col < 10; col++) {
@@ -11,6 +11,11 @@ export const renderBoard = () => {
       box.dataset.y = row.toString();
       box.dataset.x = col.toString();
       board.append(box);
+      gameState.boardData[box.id] = {
+        x: col,
+        y: row,
+        value: " ",
+      }
     }
   }
 };
@@ -30,13 +35,19 @@ const setBoardBox = (gameState, box, value, pieceColor, row) => {
   box.textContent = value === 0 ? " " : value;
   box.classList.add(classToAdd);
 
-  box.dataset.notPlaceAble = pieceColor === gameState.selfColor;
+
+  const boxDetail = gameState.boardData[box.id]
+  boxDetail.value = value;
+  boxDetail.color = pieceColor;
+  boxDetail.placeAble = pieceColor !== gameState.selfColor && pieceColor !== "W";
+
   box.dataset.value = value;
   box.dataset.color = pieceColor;
+
   box.dataset.placeAble = pieceColor !== gameState.selfColor && pieceColor !== "W";
 
   if (gameState.state === "placement") {
-    box.dataset.notPlaceAble = pieceColor === "W" || row < 5 ? "true" : "false";
+    box.dataset.placeAble = pieceColor === "W" || row < 5 ? "true" : "false";
   }
 }
 

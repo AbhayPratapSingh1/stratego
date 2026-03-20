@@ -1,8 +1,7 @@
 import { renderBoard, updateBoard } from "./render.js";
 import { submitPiecePlacementReq } from "./serverReq.js";
 import { getPiecesDeatails } from "./serverReqHandler.js";
-import { displayWaitingScreen } from "./utilities.js";
-
+import { displayWaitingScreen, MESSAGES } from "./utilities.js";
 
 const isAlreadyAssined = (id, gameState) => {
   return id in gameState.setupStore;
@@ -30,7 +29,7 @@ const handlePiecePlacementSubmit = async (gameState) => {
     placements.push({ x, y, value });
   }
 
-  displayWaitingScreen(gameState.MESSAGES.SENDING_PIECE_SETUP)
+  displayWaitingScreen(MESSAGES.SENDING_PIECE_SETUP)
 
   await submitPiecePlacementReq(placements);
 
@@ -128,14 +127,17 @@ const setBoardPlacementEventListners = (gameState) => {
 
   const setUpBoardForBoard = (c) => {
     const block = c.target;
+    const blockDetail = gameState.boardData[block.id];
     const selectedPiece = gameState.selectedPiece;
-    if (block.dataset.notPlaceAble !== "false") {
+    if (blockDetail.placeAble === "false") {
       return;
     }
 
     if (isAlreadyAssined(block.id, gameState)) {
       const prevValue = gameState.setupStore[block.id];
       const button = document.querySelector(`#type-${prevValue}`);
+
+
       const count = Number(button.dataset.count);
 
       setAddPieceButtonSpecifications(button, prevValue, Number(count) + 1);

@@ -34,3 +34,8 @@ export const PIECE_COLOR_MAP = {
   "B": "blue",
   "X": "empty",
 }
+
+export const MESSAGES = {
+  SENDING_PIECE_SETUP: "Waiting For other player to finish setup",
+  WAITING_OTHER_PLAYER_CONNECTION: "Waiting for other player to connect",
+}

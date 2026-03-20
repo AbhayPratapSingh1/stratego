@@ -24,7 +24,7 @@ export const isPlayerAvailable = (c, player) => {
 
     const { game, roomId } = createRoom(c, player, player2)
 
-    const data = { roomId: roomId, board: game.getBoard() }
+    const data = { roomId: roomId }
 
     player2.resolveWaiting({ ...data, color: game.getColor(player2.id) })
     delete player2.resolveWaiting;
@@ -34,4 +34,3 @@ export const isPlayerAvailable = (c, player) => {
 
   return { isPlayerGotPair: false, data: {} }
 }
-

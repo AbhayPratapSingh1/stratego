@@ -1,13 +1,13 @@
 import { handleGameUpdates } from "./playGame.js";
 import { handlePlacementMode } from "./placement.js";
 import { waitForOpponent } from "./serverReqHandler.js";
-import { clearActionBox, removeEventListener, displayWaitingScreen, hideWaitingScreen, PIECE_COLOR_MAP } from "./utilities.js";
+import { clearActionBox, removeEventListener, displayWaitingScreen, hideWaitingScreen, MESSAGES } from "./utilities.js";
 import { movePlayedReq } from "./serverReq.js";
 
 
 const handleMatchMaking = async (gameState) => {
 
-  displayWaitingScreen(gameState.MESSAGES.WAITING_OTHER_PLAYER_CONNECTION);
+  displayWaitingScreen(MESSAGES.WAITING_OTHER_PLAYER_CONNECTION);
   await waitForOpponent(gameState)
 
   hideWaitingScreen("")
@@ -15,8 +15,12 @@ const handleMatchMaking = async (gameState) => {
 }
 
 const moveSelectedToNewPos = async (gameState, selected, newBlock) => {
-  const { x, y } = selected.dataset;
-  const { x: x2, y: y2 } = newBlock.dataset;
+  const selectedDetail = gameState.boardData[selected.id];
+  const newBlockDetail = gameState.boardData[newBlock.id];
+
+  const { x, y } = selectedDetail;
+  const { x: x2, y: y2 } = newBlockDetail;
+
   selected.classList.remove('selected-box');
   gameState.selectedPiece = null;
   await movePlayedReq({ x: Number(x), y: Number(y) }, { x: Number(x2), y: Number(y2) })
@@ -25,7 +29,7 @@ const moveSelectedToNewPos = async (gameState, selected, newBlock) => {
 }
 
 const isBlockSelectable = (gameState, block) => {
-  const color = block.dataset.color;
+  const color = gameState.boardData[block.id].color;
   return gameState.selfColor === color;
 }
 
@@ -47,8 +51,8 @@ const addEventListenerToBoard = (gameState) => {
       gameState.selectedPiece = null;
       return
     }
-
-    if (selectedPiece && block.dataset.placeAble === "false") { // if not correct leave
+    const blockDetail = gameState.boardData[block.id];
+    if (selectedPiece && blockDetail.placeAble === "false") { // if not correct leave
       return;
     }
 
@@ -62,33 +66,6 @@ const addEventListenerToBoard = (gameState) => {
     }
 
     moveSelectedToNewPos(gameState, selectedPiece, block);
-
-    // if (isAlreadyAssined(block.id, gameState)) {
-    //   const prevValue = gameState.setupStore[block.id];
-    //   const button = document.querySelector(`#type-${prevValue}`);
-    //   const count = Number(button.dataset.count);
-
-    //   setAddPieceButtonSpecifications(button, prevValue, Number(count) + 1);
-    // }
-
-    // block.textContent = "";
-    // delete gameState.setupStore[block.id];
-
-    // if (selectedPiece) {
-    //   const { value, count: rawCount } = selectedPiece.dataset;
-    //   const count = Number(rawCount);
-
-    //   selectedPiece.classList.remove("selected-piece-btn");
-    //   setAddPieceButtonSpecifications(selectedPiece, value, count - 1);
-
-    //   gameState.setupStore[block.id] = value;
-    //   block.textContent = value;
-    //   gameState.selectedPiece = null;
-    // }
-
-    // const isAllConsumed = gameState.toConsume !== Object.keys(gameState.setupStore).length;
-    // submitButton.disabled = isAllConsumed;
-
   }
 
   board.addEventListener("click", eventListner)
@@ -117,12 +94,12 @@ window.onload = () => {
     selfColor: null,
     lastUpdatedId: 0,
 
+    board: null,
+    boardData: {},
+
     events: [],
 
-    MESSAGES: {
-      SENDING_PIECE_SETUP: "Waiting For other player to finish setup",
-      WAITING_OTHER_PLAYER_CONNECTION: "Waiting for other player to connect",
-    }
+
   }
 
   handleMatchMaking(gameState)
