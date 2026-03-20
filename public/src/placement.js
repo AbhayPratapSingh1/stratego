@@ -22,8 +22,8 @@ const handlePiecePlacementSubmit = async (gameState) => {
   const placements = [];
 
   for (const boxId in setup) {
-    const element = document.querySelector(`#${boxId}`);
-    const { x, y } = element.dataset
+    const elementData = gameState.boardData[boxId]
+    const { x, y } = elementData
     const value = setup[boxId];
 
     placements.push({ x, y, value });
@@ -79,12 +79,12 @@ export const handlePlacementMode = async (gameState) => {
   return gameState;
 };
 
-const setAddPieceButtonSpecifications = (button, value, count) => {
+const setAddPieceButtonSpecifications = (buttonsDetails, button, value, count) => {
   button.id = `type-${value}`;
   button.textContent = `${value} (${count})`;
   button.dataset.type = "piece-button";
-  button.dataset.value = value;
-  button.dataset.count = count;
+
+  buttonsDetails[button.id] = { value, count }
   button.disabled = count === 0;
 }
 
@@ -95,7 +95,7 @@ const displayPlaceablePieces = (gameState, pieces) => {
 
   const buttons = pieces.map(({ value, count }) => {
     const button = document.createElement("button");
-    setAddPieceButtonSpecifications(button, value, count);
+    setAddPieceButtonSpecifications(gameState.buttonData, button, value, count);
     return button
   })
 
@@ -129,7 +129,7 @@ const setBoardPlacementEventListners = (gameState) => {
   const setUpBoardForBoard = (c) => {
     const block = c.target;
     const blockDetail = gameState.boardData[block.id];
-    const selectedPiece = gameState.selectedPiece;
+    const selectedPieceButton = gameState.selectedPiece;
     if (blockDetail.placeAble === false) {
       return;
     }
@@ -138,21 +138,22 @@ const setBoardPlacementEventListners = (gameState) => {
       const prevValue = gameState.setupStore[block.id];
       const button = document.querySelector(`#type-${prevValue}`);
 
+      const buttonDetail = gameState.buttonsData[button.id]
+      const count = buttonDetail.count;
 
-      const count = Number(button.dataset.count);
-
-      setAddPieceButtonSpecifications(button, prevValue, Number(count) + 1);
+      setAddPieceButtonSpecifications(gameState.buttonData, button, prevValue, Number(count) + 1);
     }
 
     block.textContent = "";
     delete gameState.setupStore[block.id];
 
-    if (selectedPiece) {
-      const { value, count: rawCount } = selectedPiece.dataset;
+    if (selectedPieceButton) {
+      const selectedButtonDetails = gameState.buttonData[selectedPieceButton.id]
+      const { value, count: rawCount } = selectedButtonDetails;
       const count = Number(rawCount);
 
-      selectedPiece.classList.remove("selected-piece-btn");
-      setAddPieceButtonSpecifications(selectedPiece, value, count - 1);
+      selectedPieceButton.classList.remove("selected-piece-btn");
+      setAddPieceButtonSpecifications(gameState.buttonData, selectedPieceButton, value, count - 1);
 
       gameState.setupStore[block.id] = value;
       block.textContent = value;

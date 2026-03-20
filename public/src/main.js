@@ -23,9 +23,17 @@ const moveSelectedToNewPos = async (gameState, selected, newBlock) => {
 
   selected.classList.remove('selected-box');
   gameState.selectedPiece = null;
-  await movePlayedReq({ x: Number(x), y: Number(y) }, { x: Number(x2), y: Number(y2) })
-  await handleGameUpdates(gameState); // check for current updaet
-  await handleGameUpdates(gameState); // check for other player movement
+  const { ok } = await movePlayedReq({ x: Number(x), y: Number(y) }, { x: Number(x2), y: Number(y2) })
+
+  if (ok) {
+    console.log("Ok req");
+
+    await handleGameUpdates(gameState); // check for current updaet
+    await handleGameUpdates(gameState); // check for other player movement
+  } else {
+    console.log("not Ok req");
+
+  }
 }
 
 const isBlockSelectable = (gameState, block) => {
@@ -97,6 +105,7 @@ window.onload = () => {
 
     board: null,
     boardData: {},
+    buttonData: {},
 
     events: [],
 

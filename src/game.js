@@ -206,11 +206,10 @@ export class Game {
       return { status: -1 }
     }
 
-
     const { x, y } = this.getPosition(id, from);
     const { x: x2, y: y2 } = this.getPosition(id, to);
 
-    if (this.matrix[y][x].id !== id || this.isOccupied(y, x)) {
+    if (this.matrix[y][x].id !== id || this.isOccupied(x2, y2)) {
       console.log("OCUUPIED");
 
       return { status: -1, message: "Invalid Piece Selection" }

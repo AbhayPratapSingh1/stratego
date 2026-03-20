@@ -8,8 +8,6 @@ export const renderBoard = (gameState) => {
       box.id = `box-${row}-${col}`;
       box.classList.add("block");
       box.textContent = " ";
-      box.dataset.y = row.toString();
-      box.dataset.x = col.toString();
       board.append(box);
       gameState.boardData[box.id] = {
         x: col,
@@ -40,9 +38,6 @@ const setBoardBox = (gameState, box, value, pieceColor, row) => {
   boxDetail.value = value;
   boxDetail.color = pieceColor;
   boxDetail.placeAble = pieceColor !== gameState.selfColor && pieceColor !== "W";
-
-
-  box.dataset.placeAble = pieceColor !== gameState.selfColor && pieceColor !== "W";
 
   if (gameState.state === "placement") {
     boxDetail.placeAble = pieceColor === "W" || row > 4;
