@@ -52,7 +52,7 @@ const addEventListenerToBoard = (gameState) => {
       return
     }
     const blockDetail = gameState.boardData[block.id];
-    if (selectedPiece && blockDetail.placeAble === "false") { // if not correct leave
+    if (selectedPiece && blockDetail.placeAble === false) { // if not correct leave
       return;
     }
 
@@ -73,7 +73,8 @@ const addEventListenerToBoard = (gameState) => {
 }
 
 const startPlaying = async (gameState) => {
-  await handleGameUpdates(gameState)
+  await handleGameUpdates(gameState);
+
   hideWaitingScreen("");
   addEventListenerToBoard(gameState);
 

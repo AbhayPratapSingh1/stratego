@@ -12,7 +12,7 @@ export class Game {
     this.#setGamePhase();
     this.matrix = Array.from({ length: 10 }, () => Array.from({ length: 10 }, () => ({ value: -1, id: null })))
     this.#addWater();
-    this.turnOf = player1.id
+    this.turnOf = player1.id;
     this.piecesCount = {
       1: 1,
       2: 1,

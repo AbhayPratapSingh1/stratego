@@ -26,10 +26,10 @@ export const isPlayerAvailable = (c, player) => {
 
     const data = { roomId: roomId }
 
-    player2.resolveWaiting({ ...data, color: game.getColor(player2.id) })
+    player2.resolveWaiting({ ...data, color: game.getColor(player2.id), board: game.getBoard() })
     delete player2.resolveWaiting;
 
-    return { isPlayerGotPair: true, data: { ...data, color: game.getColor(player.id) } }
+    return { isPlayerGotPair: true, data: { ...data, color: game.getColor(player.id), board: game.getBoard() } }
   }
 
   return { isPlayerGotPair: false, data: {} }

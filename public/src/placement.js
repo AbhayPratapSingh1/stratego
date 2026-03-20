@@ -63,7 +63,8 @@ export const handlePlacementMode = async (gameState) => {
   displayPlaceablePieces(gameState, pieces);
   createSaveButton(gameState);
 
-  renderBoard();
+
+  renderBoard(gameState);
   updateBoard(gameState)
 
   const finishPlacement = new Promise((res) => {
@@ -129,7 +130,7 @@ const setBoardPlacementEventListners = (gameState) => {
     const block = c.target;
     const blockDetail = gameState.boardData[block.id];
     const selectedPiece = gameState.selectedPiece;
-    if (blockDetail.placeAble === "false") {
+    if (blockDetail.placeAble === false) {
       return;
     }
 

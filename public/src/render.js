@@ -23,10 +23,11 @@ export const renderBoard = (gameState) => {
 
 
 const setBoardBox = (gameState, box, value, pieceColor, row) => {
-  const color = box.dataset.color
 
+  const boxDetail = gameState.boardData[box.id]
+  const color = boxDetail.color
   if (color) {
-    const prevClass = PIECE_COLOR_MAP[box.dataset.color]
+    const prevClass = PIECE_COLOR_MAP[color]
     box.classList.remove(prevClass);
   }
 
@@ -36,24 +37,20 @@ const setBoardBox = (gameState, box, value, pieceColor, row) => {
   box.classList.add(classToAdd);
 
 
-  const boxDetail = gameState.boardData[box.id]
   boxDetail.value = value;
   boxDetail.color = pieceColor;
   boxDetail.placeAble = pieceColor !== gameState.selfColor && pieceColor !== "W";
 
-  box.dataset.value = value;
-  box.dataset.color = pieceColor;
 
   box.dataset.placeAble = pieceColor !== gameState.selfColor && pieceColor !== "W";
 
   if (gameState.state === "placement") {
-    box.dataset.placeAble = pieceColor === "W" || row < 5 ? "true" : "false";
+    boxDetail.placeAble = pieceColor === "W" || row > 4;
   }
 }
 
 export const updateBoard = (gameState) => {
   const board = gameState.board
-
   for (let row = 0; row < 10; row++) {
     for (let col = 0; col < 10; col++) {
       const box = document.querySelector(`#box-${row}-${col}`);
