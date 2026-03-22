@@ -14,6 +14,18 @@ const handleMatchMaking = async (gameState) => {
   return gameState
 }
 
+const isValidMove = (gameState, from, to) => {
+  const { x, y } = from;
+  const { x: x2, y: y2 } = to;
+
+  const invalids = gameState.invalidMovementPlace
+
+  if ((invalids.includes(gameState.board[y2][x2].pieceColor))) {
+    false;
+  }
+  return gameState.board[y][x].pieceColor === gameState.selfColor
+}
+
 const moveSelectedToNewPos = async (gameState, selected, newBlock) => {
   const selectedDetail = gameState.boardData[selected.id];
   const newBlockDetail = gameState.boardData[newBlock.id];
@@ -21,8 +33,15 @@ const moveSelectedToNewPos = async (gameState, selected, newBlock) => {
   const { x, y } = selectedDetail;
   const { x: x2, y: y2 } = newBlockDetail;
 
+  if (!isValidMove(gameState, selectedDetail, newBlockDetail)) {
+    console.log("Invlaid");
+    return;
+  }
+
+  console.log(gameState.board[y2][x2])
   selected.classList.remove('selected-box');
   gameState.selectedPiece = null;
+
   const { ok } = await movePlayedReq({ x: Number(x), y: Number(y) }, { x: Number(x2), y: Number(y2) })
 
   if (ok) {
@@ -103,13 +122,13 @@ window.onload = () => {
     selfColor: null,
     lastUpdatedId: 0,
 
+    invalidMovementPlace: ["X", "W"],
+
     board: null,
     boardData: {},
     buttonData: {},
 
     events: [],
-
-
   }
 
   handleMatchMaking(gameState)

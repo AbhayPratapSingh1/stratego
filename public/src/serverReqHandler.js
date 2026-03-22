@@ -34,6 +34,7 @@ export const waitForOpponent = async (gameState) => {
   gameState.resData = data;
 
   gameState.selfColor = data.color;
+  gameState.invalidMovementPlace.push(data.color);
   gameState.state = "placement";
   return;
 };

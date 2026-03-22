@@ -169,11 +169,16 @@ export class Game {
   getTurnOf() {
     return this.turnOf
   }
+
   changeTurn() {
     this.turnOf = this.turnOf === this.player1.id ? this.player2.id : this.player1.id
   }
 
   addListner(id, resolver) {
+    if (this.listners[id]) {
+      const parsedId = Number(id);
+      this.listners[id](this.getBoard(parsedId))
+    }
     this.listners[id] = resolver;
   }
 
@@ -201,22 +206,55 @@ export class Game {
     }
     return { x, y }
   }
+
+
+  isValidMove(id, { x, y }, { x: x2, y: y2 }) {
+    if (this.matrix[y][x].id !== id) {
+      return false;
+    }
+
+    if (this.matrix[y2][x2].id === id) {
+      return false;
+    }
+
+    return this.matrix[y2][x2].id === "water";
+  }
+
+  setPieceInPlace(id, value, x, y) {
+    const { value: placeValue } = this.matrix[y][x];
+
+    if (value === 0 && placeValue === 10) {
+      this.matrix[y][x] = { value, id }
+    }
+
+    if (value > placeValue) {
+      this.matrix[y][x] = { value, id }
+      return;
+    }
+    if (value < placeValue) {
+      return;
+    }
+    this.matrix[y][x] = { value: -1, id: null }
+  }
+
   updatePiece(id, from, to) {
     if (id !== this.getTurnOf()) {
       return { status: -1 }
     }
 
-    const { x, y } = this.getPosition(id, from);
-    const { x: x2, y: y2 } = this.getPosition(id, to);
+    const fromPosActual = this.getPosition(id, from);
+    const toPosActual = this.getPosition(id, to);
+    const { x, y } = fromPosActual
+    const { x: x2, y: y2 } = toPosActual
 
-    if (this.matrix[y][x].id !== id || this.isOccupied(x2, y2)) {
+    if (this.isValidMove(id, fromPosActual, toPosActual)) {
       console.log("OCUUPIED");
-
       return { status: -1, message: "Invalid Piece Selection" }
     }
-    const { value } = this.matrix[y][x]
-    this.matrix[y2][x2] = { value, id };
+    const { value } = this.matrix[y][x];
+
     this.matrix[y][x] = { value: -1, id: null };
+    this.setPieceInPlace(id, value, x2, y2)
     this.changeTurn()
     this.updateGame()
     return { status: 0 }

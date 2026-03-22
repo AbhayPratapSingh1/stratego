@@ -1,4 +1,4 @@
-import { renderBoard, updateBoard } from "./render.js";
+import { updateBoard } from "./render.js";
 import { newUpdatesFetching } from "./serverReqHandler.js";
 
 export const handleGameUpdates = async (gameState) => {
