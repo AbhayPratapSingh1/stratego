@@ -130,19 +130,23 @@ const setBoardPlacementEventListners = (gameState) => {
     const block = c.target;
     const blockDetail = gameState.boardData[block.id];
     const selectedPieceButton = gameState.selectedPiece;
+    console.log(blockDetail, selectedPieceButton, block);
+
     if (blockDetail.placeAble === false) {
       return;
     }
+    console.log("2");
 
     if (isAlreadyAssined(block.id, gameState)) {
       const prevValue = gameState.setupStore[block.id];
       const button = document.querySelector(`#type-${prevValue}`);
-
-      const buttonDetail = gameState.buttonsData[button.id]
+      console.log(gameState.buttonsData)
+      const buttonDetail = gameState.buttonData[button.id]
       const count = buttonDetail.count;
 
       setAddPieceButtonSpecifications(gameState.buttonData, button, prevValue, Number(count) + 1);
     }
+    console.log("3");
 
     block.textContent = "";
     delete gameState.setupStore[block.id];

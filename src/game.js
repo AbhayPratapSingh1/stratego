@@ -28,16 +28,16 @@ export class Game {
   }
   getSetupPieces() {
     return [
-      // { value: 1, count: 2 },
-      // { value: 2, count: 2 },
-      // { value: 3, count: 2 },
+      { value: 1, count: 1 },
+      { value: 2, count: 2 },
+      { value: 3, count: 3 },
       // { value: 4, count: 2 },
       // { value: 5, count: 2 },
       // { value: 6, count: 2 },
-      { value: 7, count: 1 },
+      // { value: 7, count: 1 },
       // { value: 8, count: 1 },
-      // { value: 9, count: 1 },
-      // { value: 10, count: 1 },
+      { value: 9, count: 1 },
+      { value: 10, count: 1 },
     ]
   }
 
@@ -223,7 +223,7 @@ export class Game {
   setPieceInPlace(id, value, x, y) {
     const { value: placeValue } = this.matrix[y][x];
 
-    if (value === 0 && placeValue === 10) {
+    if (value === 1 && placeValue === 10) {
       this.matrix[y][x] = { value, id }
     }
 
@@ -248,7 +248,6 @@ export class Game {
     const { x: x2, y: y2 } = toPosActual
 
     if (this.isValidMove(id, fromPosActual, toPosActual)) {
-      console.log("OCUUPIED");
       return { status: -1, message: "Invalid Piece Selection" }
     }
     const { value } = this.matrix[y][x];
