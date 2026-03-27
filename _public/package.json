@@ -1,7 +1,0 @@
-{
-  "name": "p5-local-project",
-  "version": "1.0.0",
-  "devDependencies": {
-    "@types/p5": "^1.7.7"
-  }
-}
